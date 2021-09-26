@@ -10,6 +10,7 @@ interface Props {
 /** what to display when the search returns no results */
 class NoResults extends Component<Props, JSX.Element> {
   static contextType = DispatchContext;
+
   render() {
     const dispatch = this.context;
     const { noResultsMessage } = this.props;

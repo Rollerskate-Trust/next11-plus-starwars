@@ -15,7 +15,10 @@ interface Props {
 }
 
 const defaultSpecies = 'unknown species';
-const firstIndex = 0, spliceLength = 1, defaultCount = 0, minLength = 0;
+const firstIndex = 0;
+const spliceLength = 1;
+const defaultCount = 0;
+const minLength = 0;
 
 /** a list of cards */
 const CardList = ({ cards, response, currentPage, noResultsMessage }: Props) => {
@@ -43,7 +46,7 @@ const CardList = ({ cards, response, currentPage, noResultsMessage }: Props) => 
               <Fragment key={name}>
                 <H2>{name || defaultSpecies}</H2>
                 { list.map(card =>
-                  <CardView key={card.id} card={card} />
+                  <CardView key={card.name} card={card} />
                 )}
               </Fragment>
             );
