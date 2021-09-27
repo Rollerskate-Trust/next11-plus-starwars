@@ -1,52 +1,44 @@
-import _ from 'lodash';
-import { useReducer } from 'react';
-import CardList from '../components/cardList';
-import DispatchContext from '../components/context/dispatchContext';
-import Counter from '../components/counter';
-import { START, updateFormField, setPosts } from '../components/database/actions';
-import type { LayoutComponent, PostModel, PostsReturn } from '../components/database/models';
+import type { LayoutComponent, PostsReturn, Posts } from '../components/database/models';
+import { updateFormField } from '../components/database/actions';
 import { getPosts } from '../components/database/queries';
-import { initialState, reducer } from '../components/database/reducer';
-import SearchInput from '../components/searchInput';
 import Layout from '../components/sitewide/layout';
+import CardList from '../components/cardList';
+import SearchInput from '../components/searchInput';
 import MetaHeader from '../components/sitewide/meta';
+import H2 from 'components/atoms/h2';
 import layoutStyles from '../styles/modules/Layout.module.scss';
-import cardStyles from '../styles/modules/Cards.module.scss';
+import { AppStateModel } from 'components/database/reducer';
 
+interface AppProps extends Posts {
+  readonly state: AppStateModel;
+}
 
-interface Props { readonly posts: PostModel[] }
+const { container, main } = layoutStyles;
 
 /** homepage component */
-const Home: LayoutComponent = (props: Props) => {
+const Home: LayoutComponent = (props: AppProps) => {
 
-  const { posts } = props;
-
-  /** setup a reducer for frontend database */
-  const [state, dispatch] = useReducer(reducer, initialState);
-
-  // save the backend data in the frontend database
-  if (state.appState === START && _.isArray(posts)) setPosts(dispatch, posts);
-
-  const { searchPhrase, siteInfo } = state;
-  const { container, main } = layoutStyles;
+  const { state } = props;
+  const { response, sortedList = {}, searchPhrase, siteInfo, currentPage, resultsLoading } = state;
 
   return (
     <Layout siteInfo={siteInfo}>
       <div className={container}>
         <MetaHeader siteInfo={siteInfo} />
-        <div className={main}>
-          <form className={cardStyles.card}>
-            <DispatchContext.Provider value={dispatch}>
-              <SearchInput
-                value={searchPhrase}
-                onChange={updateFormField}
-              ></SearchInput>
-            </DispatchContext.Provider>
-          </form>
+        <main className={main}>
+          <SearchInput value={searchPhrase} onChange={updateFormField} />
           <br />
-          <Counter />
-          <CardList cards={posts} />
-        </div>
+          { resultsLoading === true &&
+            <H2>{siteInfo.preloaderText}</H2>
+          }
+          { resultsLoading === false &&
+            <CardList
+              cards={sortedList}
+              response={response}
+              currentPage={currentPage}
+              noResultsMessage={siteInfo.noResultsMessage}/>
+          }
+        </main>
       </div>
     </Layout>
   );
